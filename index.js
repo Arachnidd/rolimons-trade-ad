@@ -88,10 +88,7 @@ function generateAd() {
 
   console.log("availableItems", availableItems);
 
-  let sendingSideNum = Math.floor(
-    Math.random() * (config.maxItemsSend - config.minItemsSend) +
-      config.minItemsSend,
-  );
+  let sendingSideNum = Math.floor(Math.random() * (config.maxItemsSend - config.minItemsSend) + config.minItemsSend);
   console.log("Total Sending Side", sendingSideNum);
   let sendingSide = [];
   for (let i = 0; i < sendingSideNum; i++) {
@@ -109,8 +106,7 @@ function generateAd() {
       totalSendValue = totalSendValue + itemValues[item].value;
     }
     console.log("Total Send Value", totalSendValue);
-    //let upgOrDown = Math.floor(Math.random() * 2);
-    let upgOrDown = 2
+    let upgOrDown = Math.floor(Math.random() * 2);
     if (upgOrDown == 1) {
       let requestValue = totalSendValue * (1 - config.RequestPercent / 100);
       let options = [];
@@ -161,7 +157,6 @@ function generateAd() {
         }
       }
     } else {
-      receivingSide.push("downgrade");
       receivingSide.push("any");
       let itemIdValArr = [];
       for (const item in itemValues) {
@@ -180,6 +175,11 @@ function generateAd() {
         const ids = randomPair.map((item) => item.id);
         console.log(ids);
         for (const id of ids) {
+          if (itemValues[id].value > Math.max(...sendingSide)) {
+            receivingSide.push("upgrade");
+          } else {
+            receivingSide.push("downgrade");
+          }
           receivingSide.push(parseFloat(id));
         }
         postAd(sendingSide, receivingSide);
