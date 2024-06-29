@@ -109,7 +109,8 @@ function generateAd() {
       totalSendValue = totalSendValue + itemValues[item].value;
     }
     console.log("Total Send Value", totalSendValue);
-    let upgOrDown = Math.floor(Math.random() * 2);
+    //let upgOrDown = Math.floor(Math.random() * 2);
+    let upgOrDown = 2
     if (upgOrDown == 1) {
       let requestValue = totalSendValue * (1 - config.RequestPercent / 100);
       let options = [];
