@@ -211,7 +211,7 @@ async function postAd(sending, receiving) {
     "offer_item_ids": sending,
     "request_item_ids": allRIds,
     "request_tags": allRTags,
-    "offer_robux": 100000
+    "offer_robux": 300000
   };
   console.log(reqBody)
   fetch(`https://api.rolimons.com/tradeads/v1/createad`, {
