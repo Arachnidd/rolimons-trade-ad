@@ -88,7 +88,7 @@ function generateAd() {
   console.log("Total Sending Side", sendingSideNum);
   let sendingSide = [];
   for (let i = 0; i < sendingSideNum; i++) {
-    let item = availableItems[Math.floor(Math.random(availableItems.length))];
+    let item = availableItems[Math.floor(Math.random() * availableItems.length)];
     sendingSide.push(parseFloat(item));
     availableItems.splice(availableItems.indexOf(item), 1);
   }
