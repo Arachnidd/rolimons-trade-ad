@@ -208,12 +208,24 @@ async function postAd(sending, receiving) {
     }
   }
 
+  let seenStrings = new Set();
+
+  const result = allRTags.filter(item => {
+    if (typeof item === 'string') {
+      if (seenStrings.has(item)) {
+        return false;
+      }
+      seenStrings.add(item);
+    }
+    return true;
+  });
+
   /*{"player_id":55495469,"offer_item_ids":[382881237,2409285794,2409285794,362051899],"request_item_ids":[4390891467],"request_tags":["any","upgrade","downgrade"],"offer_robux":10000}*/
   let reqBody = {
     "player_id": parseFloat(robloxId),
     "offer_item_ids": sending,
     "request_item_ids": allRIds,
-    "request_tags": allRTags,
+    "request_tags": result,
     "offer_robux": 0
   };
   console.log(reqBody)
