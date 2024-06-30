@@ -75,7 +75,7 @@ function generateAd() {
   let availableItems = [];
   for (const asset in playerInv) {
     for (const uaid of playerInv[asset]) {
-      if (!onHold.includes(uaid) && itemValues[asset].value >= config.minItemValue && config.maxItemValue >= itemValues[asset].value && config.sendBlacklist.includes(parseFloat(asset) === false) {
+      if (!onHold.includes(uaid) && itemValues[asset].value >= config.minItemValue && config.maxItemValue >= itemValues[asset].value && config.sendBlacklist.includes(asset) === false) {
         availableItems.push(asset);
       } else {
       }
