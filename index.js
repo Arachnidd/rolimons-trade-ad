@@ -190,13 +190,17 @@ function generateAd() {
         let maxRValue = 0
         let maxSValue = 0
         for (const item of receivingSide) {
-          if (parseFloat(itemValues[`${item}`].value) > maxRValue) {
-            maxRValue = itemValues[`${item}`].value
+          if (typeof item === 'number') {
+            if (parseFloat(itemValues[`${item}`].value) > maxRValue) {
+              maxRValue = itemValues[`${item}`].value
+            }
           }
         }
         for (const item of sendingSide) {
-          if (parseFloat(itemValues[`${item}`].value) > maxSValue) {
-            maxSValue = itemValues[`${item}`].value
+          if (typeof item === 'number') {
+            if (parseFloat(itemValues[`${item}`].value) > maxSValue) {
+              maxSValue = itemValues[`${item}`].value
+            }
           }
         }
 
