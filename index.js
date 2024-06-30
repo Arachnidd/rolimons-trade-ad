@@ -122,7 +122,7 @@ function generateAd() {
         console.log("upgrade Item", item);
         receivingSide.push(parseFloat(item));
         receivingSide.push("upgrade");
-        receivingSide.push("any");
+        receivingSide.push("adds");
         postAd(sendingSide, receivingSide);
       } else {
         receivingSide.push("any");
@@ -145,8 +145,17 @@ function generateAd() {
           for (const id of ids) {
             receivingSide.push(parseFloat(id));
           }
-          let maxRId = receivingSide.reduce((maxId, id) => (itemValues[`${id}`].value > (itemValues[`${maxId}`].value || -Infinity) ? id : maxId), ids[0]);
-          let maxSId = sendingSide.reduce((maxId, id) => (itemValues[`${id}`].value > (itemValues[`${maxId}`].value || -Infinity) ? id : maxId), ids[0]);
+          let maxRId = receivingSide.reduce((maxId, id) => {
+            const currentValue = itemValues[`${id}`].value || -Infinity;
+            const maxValue = itemValues[`${maxId}`].value || -Infinity;
+            return currentValue > maxValue ? id : maxId;
+          }, ids[0]);
+
+          let maxSId = sendingSide.reduce((maxId, id) => {
+            const currentValue = itemValues[`${id}`].value || -Infinity;
+            const maxValue = itemValues[`${maxId}`].value || -Infinity;
+            return currentValue > maxValue ? id : maxId;
+          }, ids[0]);
           if (maxSId < maxRId) {
             receivingSide.push("upgrade");
           } else {
@@ -158,7 +167,7 @@ function generateAd() {
         }
       }
     } else {
-      receivingSide.push("any");
+      receivingSide.push("adds");
       let itemIdValArr = [];
       for (const item in itemValues) {
         if (itemValues[item].type >= config.minDemand) {
@@ -182,13 +191,13 @@ function generateAd() {
           const currentValue = itemValues[`${id}`].value || -Infinity;
           const maxValue = itemValues[`${maxId}`].value || -Infinity;
           return currentValue > maxValue ? id : maxId;
-      }, ids[0]);
+        }, ids[0]);
 
         let maxSId = sendingSide.reduce((maxId, id) => {
           const currentValue = itemValues[`${id}`].value || -Infinity;
           const maxValue = itemValues[`${maxId}`].value || -Infinity;
           return currentValue > maxValue ? id : maxId;
-      }, ids[0]);
+        }, ids[0]);
         if (maxSId < maxRId) {
           receivingSide.push("upgrade");
         } else {
