@@ -178,8 +178,8 @@ function generateAd() {
         for (const id of ids) {
           receivingSide.push(parseFloat(id));
         }
-        let maxRId = receivingSide.reduce((maxId, id) => (itemValues[`${id}`].value > (itemValues[`${maxId}`].value || -Infinity) ? id : maxId), ids[0]);
-        let maxSId = sendingSide.reduce((maxId, id) => (itemValues[`${id}`].value > (itemValues[`${maxId}`].value || -Infinity) ? id : maxId), ids[0]);
+        let maxRId = receivingSide.reduce((maxId, id) => (itemValues[id].value > (itemValues[maxId].value || -Infinity) ? id : maxId), ids[0]);
+        let maxSId = sendingSide.reduce((maxId, id) => (itemValues[id].value > (itemValues[maxId].value || -Infinity) ? id : maxId), ids[0]);
         if (maxSId < maxRId) {
           receivingSide.push("upgrade");
         } else {
