@@ -5,7 +5,7 @@
    "_comment": "Available tags are 'any', 'upgrade', 'downgrade', 'rap', 'rares', 'demand', 'wishlist', 'robux', 'adds', 'projecteds'. You can leave empty for no tags at all. For smart algo, it determines if the item requested is an upgrade/downgrade. Do not add upgrade/downgrade tag with it.",
   "maxItemsSend": 4,
   "minItemsSend": 1,
-  "sendBlacklist": [23310997]
+  "sendBlacklist": [23310997],
   "RequestPercent": "10",
   "_comment2": "This is for percent UNDER the actual value. For example, 200k, 20% under that is 160k, itll add items 160-200k.",
   "minDemand": 2,
