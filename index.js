@@ -125,7 +125,7 @@ function generateAd() {
         receivingSide.push("adds");
         postAd(sendingSide, receivingSide);
       } else {
-        receivingSide.push("any");
+        receivingSide.push("adds");
         let itemIdValArr = [];
         for (const item in itemValues) {
           if (itemValues[item].type >= config.minDemand) {
