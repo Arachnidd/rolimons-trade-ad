@@ -225,8 +225,7 @@ async function postAd(sending, receiving) {
     "player_id": parseFloat(robloxId),
     "offer_item_ids": sending,
     "request_item_ids": allRIds,
-    "request_tags": result,
-    "offer_robux": 0
+    "request_tags": result
   };
   console.log(reqBody)
   fetch(`https://api.rolimons.com/tradeads/v1/createad`, {
