@@ -75,7 +75,11 @@ function generateAd() {
   let availableItems = [];
   for (const asset in playerInv) {
     for (const uaid of playerInv[asset]) {
-      if (!onHold.includes(uaid) && itemValues[asset].value >= config.minItemValue && config.maxItemValue >= itemValues[asset].value && config.sendBlacklist.includes(asset) === false) {
+      if (
+        !onHold.includes(uaid) &&
+        itemValues[asset].value >= config.minItemValue &&
+        config.maxItemValue >= itemValues[asset].value
+      ) {
         availableItems.push(asset);
       } else {
       }
@@ -88,7 +92,7 @@ function generateAd() {
   console.log("Total Sending Side", sendingSideNum);
   let sendingSide = [];
   for (let i = 0; i < sendingSideNum; i++) {
-    let item = availableItems[Math.floor(Math.random() * availableItems.length)];
+    let item = availableItems[Math.floor(Math.random(availableItems.length))];
     sendingSide.push(parseFloat(item));
     availableItems.splice(availableItems.indexOf(item), 1);
   }
@@ -125,7 +129,7 @@ function generateAd() {
         receivingSide.push("any");
         postAd(sendingSide, receivingSide);
       } else {
-        receivingSide.push("adds");
+        receivingSide.push("any");
         let itemIdValArr = [];
         for (const item in itemValues) {
           if (itemValues[item].type >= config.minDemand) {
@@ -143,12 +147,14 @@ function generateAd() {
           const ids = randomPair.map((item) => item.id);
           console.log(ids);
           for (const id of ids) {
-            if (itemValues[id].value > Math.max(...sendingSide)) {
-              receivingSide.push("upgrade");
-            } else {
-              receivingSide.push("downgrade");
-            }
             receivingSide.push(parseFloat(id));
+          }
+          let maxRId = ids.reduce((maxId, id) => (itemValues[`${id}`].value > (itemValues[`${maxId}`].value || -Infinity) ? id : maxId), ids[0]);
+          let maxSId = sendingSide.reduce((maxId, id) => (itemValues[`${id}`].value > (itemValues[`${maxId}`].value || -Infinity) ? id : maxId), ids[0]);
+          if (maxSId < maxRId) {
+            receivingSide.push("upgrade");
+          } else {
+            receivingSide.push("downgrade");
           }
           postAd(sendingSide, receivingSide);
         } else {
@@ -156,7 +162,7 @@ function generateAd() {
         }
       }
     } else {
-      receivingSide.push("adds");
+      receivingSide.push("any");
       let itemIdValArr = [];
       for (const item in itemValues) {
         if (itemValues[item].type >= config.minDemand) {
@@ -174,12 +180,14 @@ function generateAd() {
         const ids = randomPair.map((item) => item.id);
         console.log(ids);
         for (const id of ids) {
-          if (itemValues[id].value > Math.max(...sendingSide)) {
-            receivingSide.push("upgrade");
-          } else {
-            receivingSide.push("downgrade");
-          }
           receivingSide.push(parseFloat(id));
+        }
+        let maxRId = ids.reduce((maxId, id) => (itemValues[`${id}`].value > (itemValues[`${maxId}`].value || -Infinity) ? id : maxId), ids[0]);
+        let maxSId = sendingSide.reduce((maxId, id) => (itemValues[`${id}`].value > (itemValues[`${maxId}`].value || -Infinity) ? id : maxId), ids[0]);
+        if (maxSId < maxRId) {
+          receivingSide.push("upgrade");
+        } else {
+          receivingSide.push("downgrade");
         }
         postAd(sendingSide, receivingSide);
       } else {
@@ -221,7 +229,8 @@ async function postAd(sending, receiving) {
     "player_id": parseFloat(robloxId),
     "offer_item_ids": sending,
     "request_item_ids": allRIds,
-    "request_tags": result
+    "request_tags": result,
+    "offer_robux": 300000
   };
   console.log(reqBody)
   fetch(`https://api.rolimons.com/tradeads/v1/createad`, {
