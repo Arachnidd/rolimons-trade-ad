@@ -1,4 +1,4 @@
-var app=require("express")()
+var app = require("express")()
 app.use(require("body-parser").json())
 const dotenv = require('dotenv')
 dotenv.config()
@@ -129,7 +129,6 @@ function generateAd() {
         receivingSide.push("any");
         postAd(sendingSide, receivingSide);
       } else {
-        receivingSide.push("downgrade");
         receivingSide.push("any");
         let itemIdValArr = [];
         for (const item in itemValues) {
@@ -137,18 +136,22 @@ function generateAd() {
             itemIdValArr.push({ id: item, value: itemValues[item].value });
           }
         }
-        //console.log(itemIdValArr)
+        //console.log(itemIdValArr);
         let validPairs = findValidPairs(
           itemIdValArr,
           totalSendValue * (1 - config.RequestPercent / 100),
           totalSendValue,
         );
         if (validPairs.length > 0) {
-          const randomPair =
-            validPairs[Math.floor(Math.random() * validPairs.length)];
+          const randomPair = validPairs[Math.floor(Math.random() * validPairs.length)];
           const ids = randomPair.map((item) => item.id);
           console.log(ids);
           for (const id of ids) {
+            if (itemValues[id].value > Math.max(...sendingSide)) {
+              receivingSide.push("upgrade");
+            } else {
+              receivingSide.push("downgrade");
+            }
             receivingSide.push(parseFloat(id));
           }
           postAd(sendingSide, receivingSide);
