@@ -145,17 +145,22 @@ function generateAd() {
           for (const id of ids) {
             receivingSide.push(parseFloat(id));
           }
-          let maxRId = receivingSide.reduce((maxId, id) => {
-            const currentValue = itemValues[`${id}`].value || -Infinity;
-            const maxValue = itemValues[`${maxId}`].value || -Infinity;
-            return currentValue > maxValue ? id : maxId;
-          }, ids[0]);
-
-          let maxSId = sendingSide.reduce((maxId, id) => {
-            const currentValue = itemValues[`${id}`].value || -Infinity;
-            const maxValue = itemValues[`${maxId}`].value || -Infinity;
-            return currentValue > maxValue ? id : maxId;
-          }, ids[0]);
+          let maxRValue = 0
+          let maxSValue = 0
+          for (const item of receivingSide) {
+            if (typeof item === 'number') {
+              if (parseFloat(itemValues[`${item}`].value) > maxRValue) {
+                maxRValue = itemValues[`${item}`].value
+              }
+            }
+          }
+          for (const item of sendingSide) {
+            if (typeof item === 'number') {
+              if (parseFloat(itemValues[`${item}`].value) > maxSValue) {
+                maxSValue = itemValues[`${item}`].value
+              }
+            }
+          }
           if (maxSId < maxRId) {
             receivingSide.push("upgrade");
           } else {
