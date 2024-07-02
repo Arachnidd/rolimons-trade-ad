@@ -1,7 +1,9 @@
 /*
 Made by @spiderphobias on discord. (Noor)
 June 25, 2024
-Made for auto posting rolimons trade ad with a smart algorithm. This is smarter and way better then any other bot. Open source and completely free. THIS IS NOT TO ABUSE THE SITE ROLIMONS.COM! Please don't spam unrealistic trades lowering the trade quality, it doesnt help you or other users!
+Made for auto posting rolimons trade ad with a smart algorithm. This is smarter and way better then any other bot. 
+Open source and completely free. THIS IS NOT TO ABUSE THE SITE ROLIMONS.COM! 
+Please don't spam unrealistic trades lowering the trade quality, it doesnt help you or other users!
 */
 
 var app = require("express")() //this is for hosting the api and putting it on uptimerobot. This helps if your server provider is bad and you want your bot to stay up.
