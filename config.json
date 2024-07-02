@@ -1,5 +1,5 @@
 {
-  "minItemValue": 10000,
+  "minItemValue": 100000,
   "maxItemValue": 100000000,
   "smartAlgo": true,
    "_comment": "Available tags are 'any', 'upgrade', 'downgrade', 'rap', 'rares', 'demand', 'wishlist', 'robux', 'adds', 'projecteds'. You can leave empty for no tags at all. For smart algo, it determines if the item requested is an upgrade/downgrade. Do not add upgrade/downgrade tag with it.",
