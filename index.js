@@ -84,7 +84,7 @@ function generateAd() {
 
   console.log("availableItems", availableItems);
 
-  let sendingSideNum = Math.floor(Math.random() * (config.maxItemsSend - config.minItemsSend) + config.minItemsSend);
+  let sendingSideNum = Math.floor(Math.random() * (config.maxItemsSend - config.minItemsSend + 1)) + config.minItemsSend;
   console.log("Total Sending Side", sendingSideNum);
   let sendingSide = [];
   for (let i = 0; i < sendingSideNum; i++) {
