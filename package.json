@@ -1,13 +1,13 @@
 {
-  "name": "nodejs",
+  "name": "Rolimons-Ad",
   "version": "1.0.0",
-  "description": "",
+  "description": "Posts rolimons trade ads, smarter then any other bot. Actually randomizes and adds item selection, unlike other bots. This is only used for serious traders! Please dont abuse this.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Arachnid",
   "license": "ISC",
   "dependencies": {
     "@types/node": "^18.0.6",
