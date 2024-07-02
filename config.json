@@ -9,12 +9,5 @@
   "RequestPercent": "30",
   "_comment2": "This is for percent UNDER the actual value. For example, 200k, 20% under that is 160k, itll add items 160-200k.",
   "minDemand": 2,
-  "_comment3": "0 = terrible, 1 = Low, 2 = Normal, 3 = High, 4 = Amazing",
-  "randomItems": true,
-  "specificItems": {
-    "enabled": false,
-    "specificItemsSend": [],
-    "specificItemsReceive": []
-  },
-  "comment4": "Only one can be enabled, randomItems or sepcificItems."
+  "_comment3": "0 = terrible, 1 = Low, 2 = Normal, 3 = High, 4 = Amazing"
 }
