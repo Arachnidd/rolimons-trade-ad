@@ -274,7 +274,7 @@ async function postAd(sending, receiving) {
     });
   setTimeout(function () {
     getValues();
-  }, 1440000);
+  }, 1560000);
 }
 
 getValues();
