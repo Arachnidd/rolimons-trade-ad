@@ -1,6 +1,7 @@
 # Tutorial on how to setup and host it for COMPLETELY FREE!
 
-1. Get your rolimons token. You can do this by going to inspect element > application > cookies > _Roliverification OR easier way is just downloading editthiscookie from https://chromewebstore.google.com/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg and getting the _Roliverification ![image](https://github.com/ArachnidRB/rolimons-trade-ad/assets/89037932/0885d0c5-afbb-4f85-ae9e-e9a9223a6d9b)
+## 1. Get your rolimons token. 
+You can do this by going to inspect element > application > cookies > _Roliverification OR easier way is just downloading editthiscookie from https://chromewebstore.google.com/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg and getting the _Roliverification ![image](https://github.com/ArachnidRB/rolimons-trade-ad/assets/89037932/0885d0c5-afbb-4f85-ae9e-e9a9223a6d9b)
 2. Create a github account.
 3. Fork this respritory ![image](https://github.com/ArachnidRB/rolimons-trade-ad/assets/89037932/d7714391-8e91-4fac-a137-39753200572d)
 4. Navigate to config.json in YOUR respritory and adjust your config. You must be in edit mode. Also remember to save and commit changes
