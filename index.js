@@ -31,7 +31,7 @@ async function getValues() {
     },
   }).then((res) => res.json()).then((json) => {
     for (const item in json.items) {
-      let type = json.items[item][5] >= 0 ? json.items[item][5] : null;
+      let type = json.items[item][5] >= 0 ? json.items[item][5] : 0;
       itemValues[item] = { value: Math.abs(json.items[item][4]), type: type }; //assings the item values and demand
     }
     //console.log(itemValues)
