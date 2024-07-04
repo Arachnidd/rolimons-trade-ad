@@ -112,11 +112,7 @@ function generateAd() {
       let requestValue = totalSendValue * (1 - config.RequestPercent / 100);
       let options = [];
       for (const item in itemValues) {
-        if (
-          itemValues[item].value >= requestValue &&
-          itemValues[item].value <= totalSendValue &&
-          itemValues[item].type >= config.minDemand
-        ) {
+        if (itemValues[item].value >= requestValue && itemValues[item].value <= totalSendValue && itemValues[item].type >= config.minDemand && !sendingSide.includes(parseFloat(item))) {
           options.push(item);
         }
       }
@@ -161,7 +157,7 @@ function generateAd() {
               }
             }
           }
-          if (maxSId < maxRId) {
+          if (maxSValue < maxRValue) {
             receivingSide.push("upgrade");
           } else {
             receivingSide.push("downgrade");
