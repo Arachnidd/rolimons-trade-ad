@@ -165,6 +165,7 @@ function generateAd() {
           postAd(sendingSide, receivingSide);
         } else {
           console.log("No valid pairs found.");
+          generateAd();
         }
       }
     } else {
@@ -209,6 +210,7 @@ function generateAd() {
         postAd(sendingSide, receivingSide);
       } else {
         console.log("No valid pairs found.");
+        generateAd();
       }
     }
   } else {
