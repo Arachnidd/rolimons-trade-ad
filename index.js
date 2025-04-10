@@ -1,278 +1,344 @@
 /*
-Made by @spiderphobias on discord. (Noor)
-June 25, 2024
+Made by @spiderphobias (Arachnid) on discord. -- (Noor)
+April 10, 2025
 Made for auto posting rolimons trade ad with a smart algorithm. This is smarter and way better then any other bot. 
 Open source and completely free. THIS IS NOT TO ABUSE THE SITE ROLIMONS.COM! 
 Please don't spam unrealistic trades lowering the trade quality, it doesnt help you or other users!
 */
 
-var app = require("express")() //this is for hosting the api and putting it on uptimerobot. This helps if your server provider is bad and you want your bot to stay up.
-app.use(require("body-parser").json())
 
-const dotenv = require('dotenv') //used for reading the sercret from env. Since some hosting providers require you to have it public, this provides a safe environment keeping everything safe.
+const fetch = require('node-fetch');
+const config = require('./config.json');
+const logger = require('signale');
+
+
+const dotenv = require('dotenv')
 dotenv.config()
 
-const fetch = require("node-fetch");
 
-const rolimonsToken = process.env.token //gets rolimons verification token from environment
-const robloxId = process.env.robloxId //gets roblox verification token from environment. I put it here since some people would like to keep their profiles private
-const config = require("./config.json"); //gets your configuration
+var app = require("express")()
+app.use(require("body-parser").json())
 
-let itemValues = {}; //item values. Format is "itemId": {"value": "5", "type": "3"}
-let playerInv = {}; //player current inv
-let onHold = []; //items on hold
 
-//function for getting item values from rolimons. This gets demand and value of the item.
-async function getValues() {
-  await fetch(`https://api.rolimons.com/items/v1/itemdetails`, { //https request to get the item value and demand
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }).then((res) => res.json()).then((json) => {
-    for (const item in json.items) {
-      let type = json.items[item][5] >= 0 ? json.items[item][5] : 0;
-      itemValues[item] = { value: Math.abs(json.items[item][4]), type: type }; //assings the item values and demand
-    }
-    //console.log(itemValues)
-    getInv();
-  }).catch((err) => {
-    console.log(err);
-  });
-}
+const rolimonsVerificationToken = process.env.token;
+const robloxId = parseFloat(process.env.robloxId)
+let rolimonsValues = {};
 
-//function for getting your inventory and seeing items on hold.
-async function getInv() {
-  await fetch(`https://api.rolimons.com/players/v1/playerassets/${robloxId}`, { //function to get the user inventory
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-    },
-  }).then((res) => res.json()).then((json) => {
-    playerInv = json.playerAssets; //gets the players inv
-    onHold = json.holds; //assigns these items on hold
-    //console.log(playerInv);
-    //console.log(onHold);
-    generateAd();
-  }).catch((err) => {
-    console.log(err);
-  });
-}
+logger.debug("Made by @spiderphobias (on discord)\nThank you for using Empyreus Trade ad Poster ❤️!\nIf You are enjoying the bot, a star on github wouldn't hurt 😉");
+logger.fatal("NOTE: If you are using a host like render, rolimons MAY ban it. This is not an issue with the bot!\n\n");
+logger.pending("Please wait while rolimons values and items are fetched :)");
 
-//algorithm to generate possible trade ads.
-function findValidPairs(items, min, max) {
-  const validPairs = []; //possible pairs/items
-
-  for (let i = 0; i < items.length; i++) {
-    for (let j = i + 1; j < items.length; j++) {
-      const sum = items[i].value + items[j].value;
-      if (sum > min && sum < max) {
-        validPairs.push([items[i], items[j]]);
-      }
-    }
-  }
-
-  return validPairs;
-}
-
-//function to decide what items to put in the ad.
-function generateAd() {
-  let availableItems = [];
-  for (const asset in playerInv) {
-    for (const uaid of playerInv[asset]) {
-      if (!onHold.includes(uaid) && itemValues[asset].value >= config.minItemValue && config.maxItemValue >= itemValues[asset].value && !config.sendBlacklist.includes(`${asset}`)) {
-        availableItems.push(asset);
-      }
-    }
-  }
-
-  //console.log("availableItems", availableItems);
-
-  let sendingSideNum = Math.floor(Math.random() * (config.maxItemsSend - config.minItemsSend + 1)) + config.minItemsSend;
-  //console.log("Total Sending Side", sendingSideNum);
-  let sendingSide = [];
-  for (let i = 0; i < sendingSideNum; i++) {
-    let item = availableItems[Math.floor(Math.random() * availableItems.length)];
-    sendingSide.push(parseFloat(item));
-    availableItems.splice(availableItems.indexOf(item), 1);
-  }
-
-  //console.log("sending Items", sendingSide);
-
-  if (config.smartAlgo) {
-    let receivingSide = [];
-    let totalSendValue = 0;
-    for (const item of sendingSide) {
-      totalSendValue = totalSendValue + itemValues[item].value;
-    }
-    //console.log("Total Send Value", totalSendValue);
-    let upgOrDown = Math.floor(Math.random() * 2);
-    if (upgOrDown == 1) {
-      let requestValue = totalSendValue * (1 - config.RequestPercent / 100);
-      let options = [];
-      for (const item in itemValues) {
-        if (itemValues[item].value >= requestValue && itemValues[item].value <= totalSendValue && itemValues[item].type >= config.minDemand && !sendingSide.includes(parseFloat(item))) {
-          options.push(item);
-        }
-      }
-
-      if (options.length >= 1) {
-        let item = options[Math.floor(Math.random(options.length))];
-        //console.log("upgrade Item", item);
-        receivingSide.push(parseFloat(item));
-        receivingSide.push("upgrade");
-        receivingSide.push("adds");
-        postAd(sendingSide, receivingSide);
-      } else {
-        receivingSide.push("adds");
-        let itemIdValArr = [];
-        for (const item in itemValues) {
-          if (itemValues[item].type >= config.minDemand) {
-            itemIdValArr.push({ id: item, value: itemValues[item].value });
-          }
-        }
-        //console.log(itemIdValArr);
-        let validPairs = findValidPairs(itemIdValArr, totalSendValue * (1 - config.RequestPercent / 100), totalSendValue);
-        if (validPairs.length > 0) {
-          const randomPair = validPairs[Math.floor(Math.random() * validPairs.length)];
-          const ids = randomPair.map((item) => item.id);
-          //console.log(ids);
-          for (const id of ids) {
-            receivingSide.push(parseFloat(id));
-          }
-          let maxRValue = 0
-          let maxSValue = 0
-          for (const item of receivingSide) {
-            if (typeof item === 'number') {
-              if (parseFloat(itemValues[`${item}`].value) > maxRValue) {
-                maxRValue = itemValues[`${item}`].value
-              }
+async function updateValues() {
+    fetch('https://api.rolimons.com/items/v2/itemdetails', {
+        method: "GET",
+        headers: { 'Content-Type': 'application/json' }
+    })
+        .then(res => {
+            if (res.status === 200) {
+                res.json().then(json => {
+                    for (const item in json.items) {
+                        rolimonsValues[item] = {
+                            "demand": json.items[item][5],
+                            "value": json.items[item][4],
+                            "name": json.items[item][0]
+                        };
+                        if (json.items[item][1].length > 1) {
+                            rolimonsValues[item]["name"] = json.items[item][1];
+                        }
+                    }
+                    logger.complete("Updated Rolimons value!");
+                }).catch(err => {
+                    logger.fatal("Error processing rolimons API. Possibly banned from the site. Not caused by this bot.");
+                });
+            } else {
+                logger.fatal("Error getting rolimons API. Possibly banned from the site. Not caused by this bot.");
             }
-          }
-          for (const item of sendingSide) {
-            if (typeof item === 'number') {
-              if (parseFloat(itemValues[`${item}`].value) > maxSValue) {
-                maxSValue = itemValues[`${item}`].value
-              }
+        }).catch(err => {
+            logger.fatal("Error getting rolimons API. Possibly banned from the site. Not caused by this bot.");
+        });
+    await sleep(300000);
+    updateValues();
+}
+
+updateValues();
+
+async function makeAd(sItems, rItems, tags) {
+    let sendBody = (tags.length >= 1)
+        ? {
+            "player_id": robloxId,
+            "offer_item_ids": sItems.map(parseFloat),
+            "request_item_ids": rItems.map(parseFloat),
+            "request_tags": tags
+        }
+        : {
+            "player_id": robloxId,
+            "offer_item_ids": sItems.map(parseFloat),
+            "request_item_ids": rItems.map(parseFloat)
+        };
+
+    console.log(sendBody);
+    fetch('https://api.rolimons.com/tradeads/v1/createad', {
+        method: "POST",
+        headers: {
+            'content-type': 'application/json',
+            'cookie': '_RoliVerification=' + rolimonsVerificationToken
+        },
+        body: JSON.stringify(sendBody)
+    }).then(res => {
+        if (res.status === 201) {
+            let stringSend = rolimonsValues[sItems[0]].name + " (" + sItems[0] + ") - " + rolimonsValues[sItems[0]].value;
+            let stringReceive = rolimonsValues[rItems[0]].name + " (" + rItems[0] + ") - " + rolimonsValues[rItems[0]].value;
+            for (const item of sItems) {
+                stringSend = stringSend + ", " + rolimonsValues[item].name + " (" + item + ") - " + rolimonsValues[item].value;
             }
-          }
-          if (maxSValue < maxRValue) {
-            receivingSide.push("upgrade");
-          } else {
-            receivingSide.push("downgrade");
-          }
-          postAd(sendingSide, receivingSide);
+            for (const item of rItems) {
+                stringReceive = stringReceive + ", " + rolimonsValues[item].name + " (" + item + ") - " + rolimonsValues[item].value;
+            }
+            logger.success("Successfully posted ad! Sending:", stringSend, "|| Requesting: ", stringReceive);
         } else {
-          console.log("No valid pairs found.");
-          generateAd();
+            logger.fatal("error requesting rolimons trade ad api. Might be banned! This is NOT because of this bot! Status: ", res.status);
         }
-      }
-    } else {
-      receivingSide.push("adds");
-      let itemIdValArr = [];
-      for (const item in itemValues) {
-        if (itemValues[item].type >= config.minDemand) {
-          itemIdValArr.push({ id: item, value: itemValues[item].value });
-        }
-      }
-      //console.log(itemIdValArr);
-      let validPairs = findValidPairs(itemIdValArr, totalSendValue * (1 - config.RequestPercent / 100), totalSendValue);
-      if (validPairs.length > 0) {
-        const randomPair = validPairs[Math.floor(Math.random() * validPairs.length)];
-        const ids = randomPair.map((item) => item.id);
-        //console.log(ids);
-        for (const id of ids) {
-          receivingSide.push(parseFloat(id));
-        }
-        let maxRValue = 0
-        let maxSValue = 0
-        for (const item of receivingSide) {
-          if (typeof item === 'number') {
-            if (parseFloat(itemValues[`${item}`].value) > maxRValue) {
-              maxRValue = itemValues[`${item}`].value
-            }
-          }
-        }
-        for (const item of sendingSide) {
-          if (typeof item === 'number') {
-            if (parseFloat(itemValues[`${item}`].value) > maxSValue) {
-              maxSValue = itemValues[`${item}`].value
-            }
-          }
-        }
+    }).catch(err => {
+        console.log(err);
+    });
+}
 
-        if (maxSValue < maxRValue) {
-          receivingSide.push("upgrade");
+async function getUserInventory() {
+    const url = `https://api.rolimons.com/players/v1/playerassets/${robloxId}`;
+    try {
+        const res = await fetch(url, {
+            method: "GET",
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!res.ok) {
+            logger.fatal("Unable to get Rolimons inventory API. Status:", res.status);
+            return null;
+        }
+        const json = await res.json();
+        return json;
+    } catch (err) {
+        logger.fatal("Unable to get Roblox inventory API", err);
+        return null;
+    }
+}
+
+async function handleFullInventory() {
+    let cursor = "";
+    let fullData = [];
+    const json = await getUserInventory(cursor);
+    for (const item in json.playerAssets) {
+        for (const uaid of json.playerAssets[item]) {
+            if (!json.holds.includes(uaid)) {
+                fullData.push(item);
+            }
+        }
+    }
+    return fullData;
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function chooseRandomSubset(array, size) {
+    const shuffled = array.slice();
+    shuffleArray(shuffled);
+    return shuffled.slice(0, size);
+}
+
+function getRandomReceivingCount(smartConfig) {
+    const tagsCount = smartConfig.tags ? smartConfig.tags.length : 0;
+    const allowedMax = Math.min(smartConfig.maxReceiveItems, 4 - tagsCount);
+    const allowedMin = smartConfig.minReceiveItems;
+    if (allowedMax < allowedMin) return null;
+    return randomInt(allowedMin, allowedMax);
+}
+
+function generateUpgradeCombo(availableSendingItemsList, availableReceivingItemsList, numOfItemsSend, rolimonsValues, smartConfig) {
+    const maxAttempts = 100000;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const sendingCombo = chooseRandomSubset(availableSendingItemsList, numOfItemsSend);
+        if (!sendingCombo.every(item => rolimonsValues[item].value >= smartConfig.minItemValueSend)) continue;
+        const sendingValues = sendingCombo.map(item => rolimonsValues[item].value);
+        const S_total = sendingValues.reduce((a, b) => a + b, 0);
+        if (S_total < smartConfig.minTotalSend || S_total > smartConfig.maxTotalSend) continue;
+        const receivingCount = getRandomReceivingCount(smartConfig);
+        if (!receivingCount) continue;
+        const receivingCombo = chooseRandomSubset(availableReceivingItemsList, receivingCount);
+        if (!receivingCombo.every(item => rolimonsValues[item].value >= smartConfig.minItemValueRequest)) continue;
+        const receivingValues = receivingCombo.map(item => rolimonsValues[item].value);
+        const R_total = receivingValues.reduce((a, b) => a + b, 0);
+        if (smartConfig.minTotalRequestValue && R_total < smartConfig.minTotalRequestValue) continue;
+        if (smartConfig.maxTotalRequestValue && R_total > smartConfig.maxTotalRequestValue) continue;
+        const maxSending = Math.max(...sendingValues);
+        const maxReceiving = Math.max(...receivingValues);
+        if (maxSending >= maxReceiving) continue;
+        const lowerBound = R_total * (1 + smartConfig.minUpgPercent / 100);
+        const upperBound = R_total * (1 + smartConfig.maxUpgPercent / 100);
+        if (S_total < lowerBound || S_total > upperBound) continue;
+        return { finalSendingItems: sendingCombo, finalRequestingItems: receivingCombo };
+    }
+    return null;
+}
+
+function generateDowngradeCombo(availableSendingItemsList, availableReceivingItemsList, numOfItemsSend, rolimonsValues, smartConfig) {
+    const maxAttempts = 100000;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const sendingCombo = chooseRandomSubset(availableSendingItemsList, numOfItemsSend);
+        if (!sendingCombo.every(item => rolimonsValues[item].value >= smartConfig.minItemValueSend)) continue;
+        const sendingValues = sendingCombo.map(item => rolimonsValues[item].value);
+        const S_total = sendingValues.reduce((a, b) => a + b, 0);
+        if (S_total < smartConfig.minTotalSend || S_total > smartConfig.maxTotalSend) continue;
+        const receivingCount = getRandomReceivingCount(smartConfig);
+        if (!receivingCount) continue;
+        const receivingCombo = chooseRandomSubset(availableReceivingItemsList, receivingCount);
+        if (!receivingCombo.every(item => rolimonsValues[item].value >= smartConfig.minItemValueRequest)) continue;
+        const receivingValues = receivingCombo.map(item => rolimonsValues[item].value);
+        const R_total = receivingValues.reduce((a, b) => a + b, 0);
+        if (smartConfig.minTotalRequestValue && R_total < smartConfig.minTotalRequestValue) continue;
+        if (smartConfig.maxTotalRequestValue && R_total > smartConfig.maxTotalRequestValue) continue;
+        const maxSending = Math.max(...sendingValues);
+        const maxReceiving = Math.max(...receivingValues);
+        if (maxSending <= maxReceiving) continue;
+        const lowerBound = S_total * (1 + smartConfig.minDgPercent / 100);
+        const upperBound = S_total * (1 + smartConfig.maxDgPercent / 100);
+        if (R_total < lowerBound || R_total > upperBound) continue;
+        return { finalSendingItems: sendingCombo, finalRequestingItems: receivingCombo };
+    }
+    return null;
+}
+
+function generateAnyCombo(availableSendingItemsList, availableReceivingItemsList, rolimonsValues, smartConfig) {
+    const maxAttempts = 100000;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const numOfItemsSend = randomInt(smartConfig.minSendItems, smartConfig.maxSendItems);
+        const modeUpgrade = Math.random() < 0.5;
+        const sendingCombo = chooseRandomSubset(availableSendingItemsList, numOfItemsSend);
+        const sendingValues = sendingCombo.map(item => rolimonsValues[item]?.value || 0);
+        const S_total = sendingValues.reduce((a, b) => a + b, 0);
+        const receivingCount = getRandomReceivingCount(smartConfig);
+        if (!receivingCount) continue;
+        const receivingCombo = chooseRandomSubset(availableReceivingItemsList, receivingCount);
+        const receivingValues = receivingCombo.map(item => rolimonsValues[item]?.value || 0);
+        const R_total = receivingValues.reduce((a, b) => a + b, 0);
+        const maxSending = Math.max(...sendingValues);
+        const maxReceiving = Math.max(...receivingValues);
+        if (S_total < smartConfig.minTotalSend || S_total > smartConfig.maxTotalSend) continue;
+        if (R_total < smartConfig.minTotalRequestValue || R_total > smartConfig.maxTotalRequestValue) continue;
+        if (modeUpgrade) {
+            const lower = R_total * (1 + smartConfig.minUpgPercent / 100);
+            const upper = R_total * (1 + smartConfig.maxUpgPercent / 100);
+            if (maxSending >= maxReceiving) continue;
+            if (S_total >= lower && S_total <= upper) {
+                console.log("✅ Valid Upgrade Combo Found");
+                return {
+                    finalSendingItems: sendingCombo,
+                    finalRequestingItems: receivingCombo,
+                    type: "upgrade"
+                };
+            }
         } else {
-          receivingSide.push("downgrade");
+            const lower = S_total * (1 + smartConfig.minDgPercent / 100);
+            const upper = S_total * (1 + smartConfig.maxDgPercent / 100);
+            if (maxSending <= maxReceiving) continue;
+            if (R_total >= lower && R_total <= upper) {
+                console.log("✅ Valid Downgrade Combo Found");
+                return {
+                    finalSendingItems: sendingCombo,
+                    finalRequestingItems: receivingCombo,
+                    type: "downgrade"
+                };
+            }
         }
-        postAd(sendingSide, receivingSide);
-      } else {
-        console.log("No valid pairs found.");
-        generateAd();
-      }
     }
-  } else {
-    //adding manual item selection soon
-  }
+    return null;
 }
 
-//function for actually posting the trade ad
-async function postAd(sending, receiving) {
-  let allRTags = [];
-  let allRIds = [];
-
-  console.log("Giving:", sending, "requesting", receiving)
-  for (const tag of receiving) {
-    if (typeof tag === "string") {
-      allRTags.push(tag);
-    } else if (typeof tag === "number") {
-      allRIds.push(tag);
+async function getItems() {
+    let allItemIds = await handleFullInventory();
+    if (!allItemIds || allItemIds.length === 0) {
+        logger.fatal("No inventory items found.");
+        return;
     }
-  }
-
-  let seenStrings = new Set();
-
-  const result = allRTags.filter(item => {
-    if (typeof item === 'string') {
-      if (seenStrings.has(item)) {
-        return false;
-      }
-      seenStrings.add(item);
+    if (config.specificItems.enabled) {
+        for (const itemId of config.specificItems.sendingItems) {
+            if (!allItemIds.includes(itemId)) {
+                logger.fatal("Specific sending is on and some items from your inventory are missing!");
+                return;
+            }
+        }
+        makeAd(config.specificItems.sendingItems, config.specificItems.receivingItems, config.specificItems.tags);
+    } else if (config.smartAlgo.enabled) {
+        const modesEnabled = [config.smartAlgo.upgrade, config.smartAlgo.downgrade, config.smartAlgo.any].filter(Boolean).length;
+        if (modesEnabled !== 1) {
+            logger.fatal("Smart algo is enabled, BUT you can only choose one: upgrading, downgrading, or any!");
+            return;
+        }
+        let availableSendingItemsList = [];
+        for (const item of allItemIds) {
+            if (!rolimonsValues[item]) {
+                console.log("⚠️ Missing value data for", item);
+                continue;
+            }
+            const { value } = rolimonsValues[item];
+            if (!config.smartAlgo.blacklisted.includes(item) && value >= config.smartAlgo.minItemValueSend) {
+                availableSendingItemsList.push(item);
+            }
+        }
+        let availableReceivingItemsList = [];
+        const allCatalogItems = Object.keys(rolimonsValues);
+        for (const item of allCatalogItems) {
+            const { value, demand } = rolimonsValues[item];
+            if (value >= config.smartAlgo.minItemValueRequest && demand >= config.smartAlgo.minDemand) {
+                availableReceivingItemsList.push(item);
+            }
+        }
+        console.log("✅ Filtered Sending Items:", availableSendingItemsList.length, availableSendingItemsList);
+        console.log("✅ Filtered Receiving Items:", availableReceivingItemsList.length, availableReceivingItemsList);
+        if (availableSendingItemsList.length === 0 || availableReceivingItemsList.length === 0) {
+            logger.fatal("One of the item lists is empty after filtering. Cannot continue.");
+            return;
+        }
+        const minSend = config.smartAlgo.minSendItems;
+        const maxSend = Math.min(config.smartAlgo.maxSendItems, 4);
+        const numOfItemsSend = randomInt(minSend, maxSend);
+        let combo = null;
+        if (config.smartAlgo.upgrade) {
+            combo = generateUpgradeCombo(availableSendingItemsList, availableReceivingItemsList, numOfItemsSend, rolimonsValues, config.smartAlgo);
+        } else if (config.smartAlgo.downgrade) {
+            combo = generateDowngradeCombo(availableSendingItemsList, availableReceivingItemsList, numOfItemsSend, rolimonsValues, config.smartAlgo);
+        } else if (config.smartAlgo.any) {
+            combo = generateAnyCombo(availableSendingItemsList, availableReceivingItemsList, rolimonsValues, config.smartAlgo);
+        }
+        if (combo) {
+            let tags = config.smartAlgo.tags || [];
+            if (combo.type === "upgrade" && !tags.includes("upgrade")) tags.push("upgrade");
+            if (combo.type === "downgrade" && !tags.includes("downgrade")) tags.push("downgrade");
+            makeAd(combo.finalSendingItems, combo.finalRequestingItems, tags);
+        } else {
+            logger.fatal("No valid combo found for smart algo configuration.");
+        }
     }
-    return true;
-  });
-
-  /*{"player_id":55495469,"offer_item_ids":[382881237,2409285794,2409285794,362051899],"request_item_ids":[4390891467],"request_tags":["any","upgrade","downgrade"],"offer_robux":10000}*/
-  let reqBody = {
-    "player_id": parseFloat(robloxId),
-    "offer_item_ids": sending,
-    "request_item_ids": allRIds,
-    "request_tags": result
-  };
-  console.log(reqBody)
-
-  fetch(`https://api.rolimons.com/tradeads/v1/createad`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "cookie": `${rolimonsToken}`
-    },
-    body: JSON.stringify(reqBody),
-  }).then((res) => res.json()).then((json) => {
-    console.log(json);
-  }).catch((err) => {
-    console.log(err);
-  });
-  setTimeout(function () {
-    getValues();
-  }, 1560000); //you can change this timeout to every 24 mins. I did 26 mins so it doesnt overlap. Time is in milliseconds
+    await sleep(1500000);
+    getItems();
 }
 
-getValues(); //calls values function, script will start from here
+setTimeout(function () {
+    getItems();
+}, 5000);
 
 app.get("/", (req, res) => {
-  res.json({ message: 'Trade ad bot is up and running!' }); //verifies trade ad bot is up and running
+    res.json({ message: 'https://github.com/Arachnidd/rolimons-trade-ad/tree/main! || Make sure to star the github so i can continue making free things for the community ❤️\nTrade ad bot is up and running!' }); //verifies trade ad bot is up and running
 })
-app.listen(8080) //port to use for the api.
+app.listen(8080)
