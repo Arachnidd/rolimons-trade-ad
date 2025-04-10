@@ -1,13 +1,47 @@
 {
-  "minItemValue": 100000,
-  "maxItemValue": 100000000,
-  "smartAlgo": true,
-   "_comment": "Available tags are 'any', 'upgrade', 'downgrade', 'rap', 'rares', 'demand', 'wishlist', 'robux', 'adds', 'projecteds'. You can leave empty for no tags at all. For smart algo, it determines if the item requested is an upgrade/downgrade. Do not add upgrade/downgrade tag with it.",
-  "maxItemsSend": 4,
-  "minItemsSend": 2,
-  "sendBlacklist": ["23310997"],
-  "RequestPercent": "30",
-  "_comment2": "This is for percent UNDER the actual value. For example, 200k, 20% under that is 160k, itll add items 160-200k.",
-  "minDemand": 2,
-  "_comment3": "0 = terrible, 1 = Low, 2 = Normal, 3 = High, 4 = Amazing"
+    "chosingAlgorithm": "Specific Items will post ONLY what you tell it to, same ad every time. Smart algo generates an ad. You can ONLY enable one, specific or smart. For support join https://discord.gg/M58R3PR9Wv",
+    "specificItems": {
+        "enabled": false,
+        "sendingItems": [
+            "ITEM_ID_1",
+            "ITEM_ID_2"
+        ],
+        "receivingItems": [
+            "ITEM_ID_3",
+            "ITEM_ID_4"
+        ],
+        "tags": [
+            "exampleTag"
+        ],
+        "_tagOptions": ["adds", "upgrade", "downgrade", "any", "wishlist", "demand", "rares", "rap", "robux", "projecteds"]
+    },
+    "smartAlgo": {
+        "enabled": true,
+        "upgrade": false,
+        "downgrade": false,
+        "any": true,
+        "minSendItems": 3,
+        "maxSendItems": 4,
+        "minReceiveItems": 2,
+        "maxReceiveItems": 4,
+        "blacklisted": [
+            "BLACKLISTED_ITEM_ID_1",
+            "BLACKLISTED_ITEM_ID_2"
+        ],
+        "minTotalSend": 30000,
+        "maxTotalSend": 1000000,
+        "minTotalRequestValue": 30000,
+        "maxTotalRequestValue": 1000000000,
+        "minUpgPercent": 7,
+        "maxUpgPercent": 12,
+        "minDgPercent": 0,
+        "maxDgPercent": 4,
+        "minDemand": 2,
+        "minItemValueSend": 5000,
+        "minItemValueRequest": 5000,
+        "tags": [
+            "adds"
+        ],
+        "_tagOptions": ["adds", "upgrade", "downgrade", "any", "wishlist", "demand", "rares", "rap", "robux", "projecteds"]
+    }
 }
