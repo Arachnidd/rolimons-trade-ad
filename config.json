@@ -17,7 +17,7 @@
     },
     "smartAlgo": {
         "enabled": true,
-        "upgrade": false,
+        "upgrade": true,
         "downgrade": false,
         "any": true,
         "minSendItems": 3,
