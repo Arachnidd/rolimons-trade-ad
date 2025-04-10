@@ -304,8 +304,8 @@ async function getItems() {
                 availableReceivingItemsList.push(item);
             }
         }
-        console.log("✅ Filtered Sending Items:", availableSendingItemsList.length, availableSendingItemsList);
-        console.log("✅ Filtered Receiving Items:", availableReceivingItemsList.length, availableReceivingItemsList);
+        //console.log("✅ Filtered Sending Items:", availableSendingItemsList.length, availableSendingItemsList);
+        //console.log("✅ Filtered Receiving Items:", availableReceivingItemsList.length, availableReceivingItemsList);
         if (availableSendingItemsList.length === 0 || availableReceivingItemsList.length === 0) {
             logger.fatal("One of the item lists is empty after filtering. Cannot continue.");
             return;
