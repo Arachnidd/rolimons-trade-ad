@@ -20,4 +20,7 @@ Make an acc here https://uptimerobot.com/login and add the url that is generated
 ## 9. All done! 
 Click Deply Web service and check your logs for any errors! If you need support join https://discord.gg/M58R3PR9Wv.
 
+# Tutorial on how to setup on windows PC!
+To get video tutorial join https://discord.gg/M58R3PR9Wv (too large to upload here). Also make sure you have nodejs installed https://nodejs.org/en/download
+
 # PLEASE NOTE! DO NOT ABUSE ROLIMONS ADS! I made this open source to make it easier for traders and not ruin the value site! By doing this, you not only make it harder for yourself at trading but also make it harder for everyone else and can ruin trade quality. Rolimon is generous and allows trade ad bots, but if this becomes abusive he may start banning. Respect the site and respect free products :).
