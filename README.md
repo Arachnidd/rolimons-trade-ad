@@ -22,3 +22,11 @@ Make an acc here https://uptimerobot.com/login and add the url that is generated
 Click Deply Web service and check your logs for any errors! If you need support join https://discord.gg/M58R3PR9Wv.
 
 # PLEASE NOTE! DO NOT ABUSE ROLIMONS ADS! I made this open source to make it easier for traders and not ruin the value site! By doing this, you not only make it harder for yourself at trading but also make it harder for everyone else and can ruin trade quality. Rolimon is generous and allows trade ad bots, but if this becomes abusive he may start banning. Respect the site and respect free products :).
+
+# For windows tutorial
+Make sure to install and setup nodejs: https://nodejs.org/en/download
+Also recommended: https://www.win-rar.com/start.html?&L=0
+
+https://vimeo.com/1075024035/41287450ce?share=copy
+
+Join https://discord.gg/M58R3PR9Wv for free roblox trade tracker and much more!
